@@ -20,11 +20,11 @@ app.use(express.urlencoded({ extended: true }));
 const PORT = process.env.PORT || 5000;
 
 import authRoutes from "./routes/auth.route.js";
-import contentRoutes from "./routes/content.route.js";
+import capsuleRoutes from "./routes/capsule.route.js";
 
 // API's
 app.use("/api/v1/auth", authRoutes);
-app.use("/api/v1/content", contentRoutes);
+app.use("/api/v1/capsule", capsuleRoutes);
 
 const startServer = async () => {
   try {

@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-const contentSchema = new mongoose.Schema(
+const capsuleSchema = new mongoose.Schema(
   {
     type: {
       type: String,
@@ -33,4 +33,4 @@ const contentSchema = new mongoose.Schema(
   }
 );
 
-export default mongoose.model("Content", contentSchema);
+export default mongoose.model("Capsule", capsuleSchema);

@@ -5,7 +5,7 @@ function Capsules() {
   const data = [
     {
       id: 1,
-      type: "Text",
+      type: "text",
       body: "Hello World",
       openDate: "2026-01-01",
       openTime: "10:30:00 AM",
@@ -13,7 +13,7 @@ function Capsules() {
     },
     {
       id: 2,
-      type: "Text",
+      type: "text",
       body: "Hello World",
       openDate: "2026-01-01",
       openTime: "10:30:00 AM",
@@ -21,7 +21,7 @@ function Capsules() {
     },
     {
       id: 3,
-      type: "Text",
+      type: "text",
       body: "Hello World",
       openDate: "2025-12-17",
       openTime: "1:23:00 PM",
@@ -29,7 +29,7 @@ function Capsules() {
     },
   ];
   return (
-    <div className="grid grid-cols-5 gap-2 mt-10">
+    <div className="grid grid-cols-3 mt-10 gap-y-6">
       {data.map((item, idx) => (
         <Capsule
           key={idx}

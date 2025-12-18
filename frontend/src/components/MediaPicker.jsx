@@ -1,4 +1,4 @@
-import { File, Image, Music, Pen, TextInitialIcon, Video } from "lucide-react";
+import { File, Image, Music, Type, Video } from "lucide-react";
 import React, { useState } from "react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 import Form from "./Form";
@@ -20,7 +20,7 @@ function MediaPicker() {
   const options = [
     {
       name: "Text",
-      icon: TextInitialIcon,
+      icon: Type,
       bg: "bg-blue-600",
       text: "text-blue-600",
     },
@@ -33,7 +33,6 @@ function MediaPicker() {
     { name: "Video", icon: Video, bg: "bg-red-600", text: "text-red-600" },
     { name: "Image", icon: Image, bg: "bg-green-600", text: "text-green-600" },
     { name: "File", icon: File, bg: "bg-amber-600", text: "text-amber-600" },
-    { name: "Draw", icon: Pen, bg: "bg-pink-500", text: "text-pink-500" },
   ];
 
   return (
@@ -73,7 +72,7 @@ function MediaPicker() {
 
       {/* Open Form */}
       {open && <Form type={type} open={open} onClose={handleClose} />}
-      <Separator  className="mt-10"/>
+      <Separator className="mt-10" />
     </div>
   );
 }

@@ -1,9 +1,9 @@
 import { DateTimeValidator } from "../utils/DateTimeValidator.js";
-import Content from "../models/content.model.js";
+import Capsule from "../models/capsule.model.js";
 import { validateBodyByType } from "../utils/ValidateBodyByType.js";
 
-// ----------------------------------------------------- Add Content ---------------------------------------
-export const addContent = async (req, res) => {
+// ----------------------------------------------------- Add capsule ---------------------------------------
+export const addCapsule = async (req, res) => {
   try {
     const userId = req.user.userId;
 
@@ -24,24 +24,24 @@ export const addContent = async (req, res) => {
       return res.status(400).json({ message: bodyError });
     }
 
-    let contentBody;
+    let capsuleBody;
 
-    // TEXT CONTENT
+    // TEXT capsule
     if (type === "text") {
       if (!body || typeof body !== "string") {
         return res.status(400).json({ message: "Text body is required" });
       }
-      contentBody = body;
+      capsuleBody = body;
     }
 
-    // FILE BASED CONTENT
+    // FILE BASED capsule
     else {
       if (!req.file) {
         return res.status(400).json({ message: "File is required" });
       }
 
       // if using Cloudinary → upload here
-      contentBody = {
+      capsuleBody = {
         originalName: req.file.originalname,
         mimeType: req.file.mimetype,
         size: req.file.size,
@@ -49,48 +49,48 @@ export const addContent = async (req, res) => {
       };
     }
 
-    // console.log(contentBody);
+    // console.log(capsuleBody);
 
-    const newContent = await Content.create({
+    const newCapsule = await Capsule.create({
       user: userId,
       type,
-      body: contentBody,
+      body: capsuleBody,
       openDate,
       openTime,
     });
 
     res
       .status(201)
-      .json({ success: true, message: "Content added successfully" });
+      .json({ success: true, message: "Capsule added successfully" });
   } catch (error) {
-    console.error("Add Content Error:", error);
+    console.error("Add capsule Error:", error);
     return res.status(500).json({ message: "Internal Server Error" });
   }
 };
 
-// ----------------------------------------------------- Delete Content ---------------------------------------
-export const deleteContent = async (req, res) => {
+// ----------------------------------------------------- Delete capsule ---------------------------------------
+export const deleteCapsule = async (req, res) => {
   try {
-    const { contentId } = req.params;
+    const { capsuleId } = req.params;
     const userId = req.user.userId;
 
-    const content = await Content.findById(contentId);
-    if (!content)
-      return res.status(404).json({ message: "Content not found." });
+    const capsule = await Capsule.findById(capsuleId);
+    if (!capsule)
+      return res.status(404).json({ message: "capsule not found." });
 
-    if (content.user.toString() !== userId)
+    if (capsule.user.toString() !== userId)
       return res.status(403).json({ message: "Unauthorized." });
 
-    if (content.isSealed)
-      return res.status(400).json({ message: "Cannot delete sealed content." });
+    if (capsule.isSealed)
+      return res.status(400).json({ message: "Cannot delete sealed capsule." });
 
-    await Content.findByIdAndDelete(contentId);
+    await capsule.findByIdAndDelete(capsuleId);
 
     res
       .status(200)
-      .json({ success: true, message: "Content deleted successfully" });
+      .json({ success: true, message: "Capsule deleted successfully" });
   } catch (error) {
-    console.error("Delete Content Error:", error);
+    console.error("Delete capsule Error:", error);
     return res.status(500).json({ message: "Internal Server Error" });
   }
 };
