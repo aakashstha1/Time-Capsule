@@ -36,15 +36,19 @@ export const signup = async (req, res) => {
     const salt = await bcryptjs.genSalt(10);
     const hashedPassword = await bcryptjs.hash(password, salt);
 
-    const newUser = await User.create({
+    const user = await User.create({
       username,
       email,
       password: hashedPassword,
     });
 
-    res
-      .status(201)
-      .json({ success: true, message: "User created successfully" });
+    const { password: pwd, ...rest } = user._doc;
+
+    res.status(201).json({
+      success: true,
+      message: "User created successfully",
+      user: rest,
+    });
   } catch (error) {
     console.error("Signup Error:", error);
     return res.status(500).json({ message: "Internal Server Error" });
@@ -79,13 +83,15 @@ export const login = async (req, res) => {
       }
     );
 
+    const { password: pwd, ...rest } = user._doc;
+
     res
       .cookie("token", token, {
         httpOnly: true,
         maxAge: 24 * 60 * 60 * 1000,
       })
       .status(200)
-      .json({ success: true, message: "Login successful" });
+      .json({ success: true, message: "Login successful", user: rest });
   } catch (error) {
     console.error("Login Error:", error);
     return res.status(500).json({ message: "Internal Server Error" });

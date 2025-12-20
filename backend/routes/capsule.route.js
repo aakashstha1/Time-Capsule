@@ -5,10 +5,12 @@ import upload from "../configs/cloudinaryWithMulter.js";
 import {
   addCapsule,
   deleteCapsule,
+  getCapsules,
 } from "../controllers/capsule.controller.js";
 const router = express.Router();
 
+router.get("/", verifyToken, getCapsules);
 router.post("/add", verifyToken, upload.single("file"), addCapsule);
-router.delete("/:contentId", verifyToken, deleteCapsule);
+router.delete("/:capsuleId", verifyToken, deleteCapsule);
 
 export default router;

@@ -2,6 +2,7 @@ import { CloudinaryStorage } from "multer-storage-cloudinary";
 import { v2 as cloudinary } from "cloudinary";
 import multer from "multer";
 import dotenv from "dotenv";
+import path from "path";
 
 dotenv.config({ quiet: true });
 
@@ -12,19 +13,26 @@ cloudinary.config({
 });
 
 const storage = new CloudinaryStorage({
-  cloudinary: cloudinary,
+  cloudinary,
   params: async (req, file) => {
     let resourceType = "raw";
+
     if (file.mimetype.startsWith("image/")) resourceType = "image";
     else if (
       file.mimetype.startsWith("video/") ||
       file.mimetype.startsWith("audio/")
     )
       resourceType = "video";
+    else if (file.mimetype === "application/pdf") resourceType = "auto";
+
+    const fileName = path
+      .parse(file.originalname)
+      .name.replace(/\s+/g, "-")
+      .toLowerCase();
 
     return {
       folder: "TimeCapsule",
-      public_id: file.originalname + "-" + Date.now(),
+      public_id: `${fileName}-${Date.now()}`,
       resource_type: resourceType,
     };
   },

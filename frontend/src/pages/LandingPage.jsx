@@ -4,7 +4,7 @@ import React from "react";
 
 function LandingPage() {
   return (
-    <div className="flex min-h-screen bg-purple-500">
+    <div className="flex min-h-screen bg-linear-to-b from-purple-600 to-purple-400">
       <Login />
       <About />
     </div>

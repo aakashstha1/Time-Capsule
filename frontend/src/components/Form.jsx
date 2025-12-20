@@ -1,5 +1,3 @@
-"use client";
-
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -20,30 +18,54 @@ import {
 } from "@/components/ui/popover";
 import { ChevronDownIcon } from "lucide-react";
 import { Textarea } from "./ui/textarea";
+import { toast } from "sonner";
+import axios from "axios";
+import { PacmanLoader } from "react-spinners";
 
-function Form({ type, open, onClose }) {
+function Form({ type, open, onClose, onCapsuleAdded }) {
+  const API_URL = "http://localhost:8000/api/v1";
   const [date, setDate] = useState(undefined);
   const [calendarOpen, setCalendarOpen] = useState(false);
   const [time, setTime] = useState("00:00:00");
   const [text, setText] = useState("");
   const [file, setFile] = useState(null);
+  const [loading, setLoading] = useState(false);
+  // console.log(date, time);
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!date || !time) {
-      alert("Please select date and time");
+      toast.error("Please select date and time");
       return;
     }
 
-    const payload = {
-      type: type.toLowerCase(),
-      openDate: date.toISOString().split("T")[0], // YYYY-MM-DD
-      openTime: time, // HH:mm:ss
-      body: type === "Text" ? text : file,
-    };
+    const formData = new FormData();
+    formData.append("type", type.toLowerCase());
 
-    console.log("Payload:", payload);
+    const yyyy = date.getFullYear();
+    const mm = (date.getMonth() + 1).toString().padStart(2, "0"); // month is 0-indexed
+    const dd = date.getDate().toString().padStart(2, "0");
 
-    // Close the dialog
+    formData.append("openDate", `${yyyy}-${mm}-${dd}`); // local date
+    formData.append("openTime", time); // keep time string
+    if (type.toLowerCase() === "text") {
+      formData.append("body", text);
+    } else {
+      formData.append("file", file);
+    }
+    // Then send via axios
+    try {
+      setLoading(true);
+      const res = await axios.post(`${API_URL}/capsule/add`, formData, {
+        withCredentials: true,
+      });
+      toast.success(res?.data?.message || "Capsule added successfully");
+      // console.log(res?.data);
+      onCapsuleAdded(res?.data?.capsule);
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Capsule addition failed");
+    } finally {
+      setLoading(false);
+    }
     onClose(false);
   };
 
@@ -51,7 +73,9 @@ function Form({ type, open, onClose }) {
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
-          <DialogTitle>{type}</DialogTitle>
+          <DialogTitle>
+            {type?.charAt(0).toUpperCase() + type?.slice(1)}
+          </DialogTitle>
         </DialogHeader>
 
         <div className="grid gap-4">
@@ -107,7 +131,7 @@ function Form({ type, open, onClose }) {
           </div>
 
           {/* Form Inputs based on type */}
-          {type === "Text" && (
+          {type === "text" && (
             <div className="grid gap-3">
               <Label htmlFor="text-content">Text</Label>
               <Textarea
@@ -118,20 +142,20 @@ function Form({ type, open, onClose }) {
               />
             </div>
           )}
-          {["Audio", "Video", "Image", "File"].includes(type) && (
+          {["audio", "video", "image", "file"].includes(type) && (
             <div className="grid gap-3">
               <Label htmlFor="file-upload">
-                {type === "File" ? "Upload File" : `Upload ${type}`}
+                {type === "file" ? "Upload File" : `Upload ${type}`}
               </Label>
               <Input
                 id="file-upload"
                 type="file"
                 accept={
-                  type === "Audio"
+                  type === "audio"
                     ? "audio/*"
-                    : type === "Video"
+                    : type === "video"
                     ? "video/*"
-                    : type === "Image"
+                    : type === "image"
                     ? "image/*"
                     : "*"
                 }
@@ -144,8 +168,8 @@ function Form({ type, open, onClose }) {
           <DialogClose asChild>
             <Button variant="outline">Cancel</Button>
           </DialogClose>
-          <Button type="submit" onClick={handleSubmit}>
-            Save
+          <Button type="submit" onClick={handleSubmit} disabled={loading}>
+            {loading ? <PacmanLoader size={10} color="#fff" /> : "Submit"}
           </Button>
         </DialogFooter>
       </DialogContent>

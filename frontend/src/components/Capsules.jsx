@@ -1,44 +1,41 @@
 import React from "react";
 import Capsule from "./Capsule";
+import { Skeleton } from "./ui/skeleton";
 
-function Capsules() {
-  const data = [
-    {
-      id: 1,
-      type: "text",
-      body: "Hello World",
-      openDate: "2026-01-01",
-      openTime: "10:30:00 AM",
-      created_At: "2023-01-01 12:30:11 PM",
-    },
-    {
-      id: 2,
-      type: "text",
-      body: "Hello World",
-      openDate: "2026-01-01",
-      openTime: "10:30:00 AM",
-      created_At: "2023-01-01 12:30:11 PM",
-    },
-    {
-      id: 3,
-      type: "text",
-      body: "Hello World",
-      openDate: "2025-12-17",
-      openTime: "1:23:00 PM",
-      created_At: "2023-01-01 12:30:11 PM",
-    },
-  ];
+function Capsules({ capsules = [], loading, setCapsules }) {
+  if (loading) {
+    return (
+      <div className="grid grid-cols-3 mt-10 gap-y-6">
+        {Array.from({ length: 6 }).map((_, idx) => (
+          <CapsuleSkeleton key={idx} />
+        ))}
+      </div>
+    );
+  }
+
+  if (capsules.length === 0) {
+    return (
+      <div className="mt-10 text-center text-gray-500">
+        No capsules created yet.
+      </div>
+    );
+  }
+
   return (
     <div className="grid grid-cols-3 mt-10 gap-y-6">
-      {data.map((item, idx) => (
+      {capsules.map((item) => (
         <Capsule
-          key={idx}
-          id={item.id}
+          key={item._id}
+          id={item._id}
           type={item.type}
           body={item.body}
+          file={item.file}
           openDate={item.openDate}
           openTime={item.openTime}
-          created_At={item.created_At}
+          created_At={item.createdAt}
+          onDelete={(id) =>
+            setCapsules((prev) => prev.filter((c) => c._id !== id))
+          }
         />
       ))}
     </div>
@@ -46,3 +43,22 @@ function Capsules() {
 }
 
 export default Capsules;
+
+function CapsuleSkeleton() {
+  return (
+    <div className=" w-100 border rounded-full p-4 flex flex-col items-center gap-4 shadow-lg bg-white animate-pulse">
+      {/* Title */}
+      <Skeleton className="h-6 w-32 rounded-md" />
+
+      <Skeleton className="h-6 w-56 rounded-md" />
+
+      <Skeleton className="h-6 w-56 rounded-md" />
+
+      {/* Countdown */}
+      <Skeleton className="h-8 w-72 rounded-md" />
+
+      {/* Button  */}
+      <Skeleton className="h-10 w-24 rounded-md" />
+    </div>
+  );
+}

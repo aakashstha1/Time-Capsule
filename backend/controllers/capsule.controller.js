@@ -1,67 +1,75 @@
 import { DateTimeValidator } from "../utils/DateTimeValidator.js";
 import Capsule from "../models/capsule.model.js";
 import { validateBodyByType } from "../utils/ValidateBodyByType.js";
+import { v2 as cloudinary } from "cloudinary";
+
+// ----------------------------------------------------- Get loggedin User capsules ---------------------------------------
+export const getCapsules = async (req, res) => {
+  try {
+    const userId = req.user.userId;
+    if (!userId) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    const capsules = await Capsule.find({ user: userId }).sort({
+      createdAt: -1,
+    });
+    res.status(200).json(capsules);
+  } catch (error) {
+    console.log("Capsule Fetch error", error);
+    res.status(500).json({ message: "Failed to fetch capsules" });
+  }
+};
 
 // ----------------------------------------------------- Add capsule ---------------------------------------
 export const addCapsule = async (req, res) => {
   try {
     const userId = req.user.userId;
-
     const { type, body, openDate, openTime } = req.body;
+    const file = req.file;
+
     if (!type || !openDate || !openTime) {
       return res.status(400).json({ message: "All fields are required" });
     }
 
+    // Validate open date & time
     const result = DateTimeValidator(openDate, openTime);
     if (!result.valid) {
       return res.status(400).json({ message: result.message });
     }
 
-    // Body validation based on type
-    const bodyError = validateBodyByType(type, body, req.file);
-
+    // Validate body/file based on type
+    const bodyError = validateBodyByType(type, body, file);
     if (bodyError) {
       return res.status(400).json({ message: bodyError });
     }
 
-    let capsuleBody;
+    let capsuleData = { user: userId, type, openDate, openTime };
 
-    // TEXT capsule
     if (type === "text") {
-      if (!body || typeof body !== "string") {
+      // TEXT capsule
+      if (!body)
         return res.status(400).json({ message: "Text body is required" });
-      }
-      capsuleBody = body;
-    }
-
-    // FILE BASED capsule
-    else {
-      if (!req.file) {
-        return res.status(400).json({ message: "File is required" });
-      }
-
-      // if using Cloudinary → upload here
-      capsuleBody = {
-        originalName: req.file.originalname,
-        mimeType: req.file.mimetype,
-        size: req.file.size,
-        url: req.file.path,
+      capsuleData.body = body;
+    } else {
+      // FILE capsule (image, audio, video, generic file)
+      if (!file) return res.status(400).json({ message: "File is required" });
+      capsuleData.file = {
+        originalName: file.originalname,
+        mimeType: file.mimetype,
+        size: file.size,
+        url: file.path,
+        public_id: file.filename,
       };
     }
 
-    // console.log(capsuleBody);
+    const newCapsule = await Capsule.create(capsuleData);
 
-    const newCapsule = await Capsule.create({
-      user: userId,
-      type,
-      body: capsuleBody,
-      openDate,
-      openTime,
+    res.status(201).json({
+      success: true,
+      message: "Capsule added successfully",
+      capsule: newCapsule,
     });
-
-    res
-      .status(201)
-      .json({ success: true, message: "Capsule added successfully" });
   } catch (error) {
     console.error("Add capsule Error:", error);
     return res.status(500).json({ message: "Internal Server Error" });
@@ -75,20 +83,34 @@ export const deleteCapsule = async (req, res) => {
     const userId = req.user.userId;
 
     const capsule = await Capsule.findById(capsuleId);
-    if (!capsule)
-      return res.status(404).json({ message: "capsule not found." });
+    if (!capsule) {
+      return res.status(404).json({ message: "Capsule not found." });
+    }
 
-    if (capsule.user.toString() !== userId)
+    // ownership check
+    if (capsule.user.toString() !== userId) {
       return res.status(403).json({ message: "Unauthorized." });
+    }
 
-    if (capsule.isSealed)
+    // sealed check
+    if (capsule.isSealed) {
       return res.status(400).json({ message: "Cannot delete sealed capsule." });
+    }
 
-    await capsule.findByIdAndDelete(capsuleId);
+    //  DELETE FROM CLOUDINARY ONLY IF FILE EXISTS
 
-    res
-      .status(200)
-      .json({ success: true, message: "Capsule deleted successfully" });
+    if (capsule.file?.public_id) {
+      await cloudinary.uploader.destroy(capsule.file.public_id, {
+        resource_type: "raw",
+      });
+    }
+
+    await Capsule.findByIdAndDelete(capsuleId);
+
+    return res.status(200).json({
+      success: true,
+      message: "Capsule deleted successfully",
+    });
   } catch (error) {
     console.error("Delete capsule Error:", error);
     return res.status(500).json({ message: "Internal Server Error" });

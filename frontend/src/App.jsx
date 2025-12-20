@@ -2,14 +2,23 @@ import React from "react";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import LandingPage from "./pages/LandingPage";
 import HomePage from "./pages/homePage";
+import { GuestRoute, ProtectedRoute } from "./components/ProtectedRoutes";
 const appRouter = createBrowserRouter([
   {
     path: "/",
-    element: <LandingPage />,
+    element: (
+      <GuestRoute>
+        <LandingPage />
+      </GuestRoute>
+    ),
   },
   {
     path: "/capsules",
-    element: <HomePage />,
+    element: (
+      <ProtectedRoute>
+        <HomePage />
+      </ProtectedRoute>
+    ),
   },
 ]);
 function App() {

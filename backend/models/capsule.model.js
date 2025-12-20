@@ -8,8 +8,14 @@ const capsuleSchema = new mongoose.Schema(
       required: true,
     },
     body: {
-      type: mongoose.Schema.Types.Mixed,
-      required: true,
+      type: String,
+    },
+    file: {
+      originalName: String,
+      mimeType: String,
+      size: Number,
+      url: String,
+      public_id: String,
     },
     openDate: {
       type: String,

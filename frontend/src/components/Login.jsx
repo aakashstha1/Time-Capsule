@@ -1,4 +1,4 @@
-import React, {  useState } from "react";
+import React, { useState } from "react";
 import { Button } from "./ui/button";
 import {
   Dialog,
@@ -11,9 +11,17 @@ import {
 } from "./ui/dialog";
 import { Label } from "./ui/label";
 import { Input } from "./ui/input";
+import axios from "axios";
+import { useAuth } from "@/context/AuthContext";
+import { PacmanLoader } from "react-spinners";
+import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
 
 function Login() {
+  const navigate = useNavigate();
   const [dialogType, setDialogType] = useState(null); // "login" | "signup"
+  const { login, loading } = useAuth();
+  const API_URL = "http://localhost:8000/api/v1";
 
   const initialForm = {
     username: "",
@@ -34,46 +42,78 @@ function Login() {
     switchDialog("login");
   };
 
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    try {
+      if (isLogin) {
+        await login({
+          email: formData.email,
+          password: formData.password,
+        });
+        navigate("/capsules");
+      } else {
+        const res = await axios.post(
+          `${API_URL}/auth/signup`,
+          {
+            username: formData.username,
+            email: formData.email,
+            password: formData.password,
+          },
+          { withCredentials: true }
+        );
+        toast.success(res?.data?.message || "Signup successful");
+        return;
+      }
+      switchDialog("login");
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Signup failed");
+
+      console.error(err.message);
+    }
+  };
+
   return (
-    <div className="w-1/2 bg-white border rounded-tr-full rounded-br-full my-5 grid items-center justify-center">
-      <div className="text-6xl font-bold flex flex-col items-center space-y-4">
-        <h1 className="">Welcome </h1>
-        <h1>To </h1>
-        <h1>Time Capsule </h1>
+    <div className="w-1/2 h-screen flex flex-col justify-center items-center bg-white border rounded-tr-full rounded-br-full p-10 shadow-lg">
+      {/* Welcome Text */}
+      <div className="text-5xl md:text-6xl font-extrabold text-center space-y-2 mb-10 animate-fade-in">
+        <h1>Welcome</h1>
+        <h1>to</h1>
+        <h1>Time Capsule</h1>
       </div>
+
+      {/* Login/Signup Button */}
       <Button
-        variant={"link"}
-        className="text-xl font-semibold"
+        variant="outline"
+        className="text-xl font-semibold px-10 py-4 hover:bg-purple-600 hover:text-white transition-all duration-300"
         onClick={handleLoginOpen}
       >
-        Login/Signup
+        Login / Signup
       </Button>
 
       {/* Dialog */}
-      <Dialog
-        open={!!dialogType}
-        onOpenChange={() => {
-          setDialogType(null);
-        }}
-      >
-        <DialogContent className="sm:max-w-106">
+      <Dialog open={!!dialogType} onOpenChange={() => setDialogType(null)}>
+        <DialogContent className="sm:max-w-md w-full rounded-xl bg-white p-6 shadow-xl">
           <DialogHeader>
-            <DialogTitle>{isLogin ? "Login" : "Signup"}</DialogTitle>
-            <DialogDescription>
+            <DialogTitle className="text-2xl font-bold">
+              {isLogin ? "Login" : "Signup"}
+            </DialogTitle>
+            <DialogDescription className="text-gray-600 mt-1">
               {isLogin
-                ? "Enter the credentials to login."
-                : "Enter the credentials to signup."}
+                ? "Enter your credentials to login."
+                : "Create an account to get started."}
             </DialogDescription>
           </DialogHeader>
 
           {/* Form */}
-          <form className="grid gap-4">
+          <form className="grid gap-4 mt-4" onSubmit={handleSubmit}>
             {isSignup && (
-              <div className="grid gap-3">
+              <div className="grid gap-1">
                 <Label>Username</Label>
                 <Input
                   type="text"
                   value={formData.username}
+                  placeholder="Your username"
                   onChange={(e) =>
                     setFormData({ ...formData, username: e.target.value })
                   }
@@ -81,44 +121,58 @@ function Login() {
               </div>
             )}
 
-            <div className="grid gap-3">
+            <div className="grid gap-1">
               <Label>Email</Label>
               <Input
                 type="email"
                 value={formData.email}
+                placeholder="your@email.com"
                 onChange={(e) =>
                   setFormData({ ...formData, email: e.target.value })
                 }
               />
             </div>
 
-            <div className="grid gap-3">
+            <div className="grid gap-1">
               <Label>Password</Label>
               <Input
                 type="password"
                 value={formData.password}
+                placeholder="********"
                 onChange={(e) =>
                   setFormData({ ...formData, password: e.target.value })
                 }
               />
             </div>
 
-            <DialogFooter>
+            <div className="mt-4 flex flex-col gap-3">
+              <Button
+                type="submit"
+                className="bg-purple-600 text-white hover:bg-purple-700"
+                disabled={loading}
+              >
+                {loading ? (
+                  <PacmanLoader size={10} color="yellow" />
+                ) : isLogin ? (
+                  "Login"
+                ) : (
+                  "Signup"
+                )}
+              </Button>
               <DialogClose asChild>
                 <Button variant="outline">Cancel</Button>
               </DialogClose>
-              <Button type="submit">{isLogin ? "Login" : "Signup"}</Button>
-            </DialogFooter>
+            </div>
           </form>
 
-          {/* Switch */}
-          <p className="text-sm text-center">
+          {/* Switch Link */}
+          <p className="text-sm text-center mt-4 text-gray-600">
             {isLogin ? "Don't have an account?" : "Already have an account?"}{" "}
             <span
-              className="cursor-pointer hover:text-blue-600 hover:underline"
+              className="cursor-pointer text-purple-600 hover:underline"
               onClick={() => switchDialog(isLogin ? "signup" : "login")}
             >
-              Click to {isLogin ? "Signup" : "Login"}
+              {isLogin ? "Signup" : "Login"} here
             </span>
           </p>
         </DialogContent>

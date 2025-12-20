@@ -3,8 +3,13 @@ import React, { useState } from "react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 import Form from "./Form";
 import { Separator } from "./ui/separator";
+import { ImExit } from "react-icons/im";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/context/AuthContext";
 
-function MediaPicker() {
+function MediaPicker({ onCapsuleAdded }) {
+  const navigate = useNavigate();
+  const { logout } = useAuth();
   const [open, setOpen] = useState(false);
   const [type, setType] = useState(null);
 
@@ -17,26 +22,36 @@ function MediaPicker() {
     setOpen(false);
   };
 
+  const handleLogout = async () => {
+    await logout();
+    navigate("/");
+  };
+
   const options = [
     {
-      name: "Text",
+      name: "text",
       icon: Type,
       bg: "bg-blue-600",
       text: "text-blue-600",
     },
     {
-      name: "Audio",
+      name: "audio",
       icon: Music,
       bg: "bg-purple-600",
       text: "text-purple-600",
     },
-    { name: "Video", icon: Video, bg: "bg-red-600", text: "text-red-600" },
-    { name: "Image", icon: Image, bg: "bg-green-600", text: "text-green-600" },
-    { name: "File", icon: File, bg: "bg-amber-600", text: "text-amber-600" },
+    { name: "video", icon: Video, bg: "bg-red-600", text: "text-red-600" },
+    { name: "image", icon: Image, bg: "bg-green-600", text: "text-green-600" },
+    {
+      name: "file",
+      icon: File,
+      bg: "bg-amber-600",
+      text: "text-amber-600",
+    },
   ];
 
   return (
-    <div className="flex flex-col mt-10">
+    <div className="relative flex flex-col mt-10">
       <h1 className="text-3xl font-bold text-center">
         What do you want to Seal?
       </h1>
@@ -70,8 +85,22 @@ function MediaPicker() {
         })}
       </div>
 
+      <div
+        onClick={handleLogout}
+        className="absolute top-2 right-2 rounded-full hover:bg-gray-200 h-10 w-10 flex items-center justify-center cursor-pointer"
+      >
+        <ImExit size={20} color="red" />
+      </div>
+
       {/* Open Form */}
-      {open && <Form type={type} open={open} onClose={handleClose} />}
+      {open && (
+        <Form
+          type={type}
+          open={open}
+          onClose={handleClose}
+          onCapsuleAdded={onCapsuleAdded}
+        />
+      )}
       <Separator className="mt-10" />
     </div>
   );
