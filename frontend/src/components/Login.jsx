@@ -5,7 +5,6 @@ import {
   DialogClose,
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from "./ui/dialog";
@@ -21,7 +20,7 @@ function Login() {
   const navigate = useNavigate();
   const [dialogType, setDialogType] = useState(null); // "login" | "signup"
   const { login, loading } = useAuth();
-  const API_URL = "http://localhost:8000/api/v1";
+  const API_URL = `${import.meta.env.VITE_API_URL}`;
 
   const initialForm = {
     username: "",
@@ -60,7 +59,7 @@ function Login() {
             email: formData.email,
             password: formData.password,
           },
-          { withCredentials: true }
+          { withCredentials: true },
         );
         toast.success(res?.data?.message || "Signup successful");
         return;
@@ -113,7 +112,7 @@ function Login() {
                 <Input
                   type="text"
                   value={formData.username}
-                  placeholder="Your username"
+                  placeholder="Enter username"
                   onChange={(e) =>
                     setFormData({ ...formData, username: e.target.value })
                   }
@@ -126,7 +125,7 @@ function Login() {
               <Input
                 type="email"
                 value={formData.email}
-                placeholder="your@email.com"
+                placeholder="Enter email"
                 onChange={(e) =>
                   setFormData({ ...formData, email: e.target.value })
                 }

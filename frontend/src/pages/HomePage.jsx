@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 
 function HomePage() {
-  const API_URL = "http://localhost:8000/api/v1";
+  const API_URL = `${import.meta.env.VITE_API_URL}`;
 
   const [capsules, setCapsules] = useState([]);
   const [loading, setLoading] = useState(false);

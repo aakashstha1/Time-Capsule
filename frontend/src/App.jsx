@@ -20,6 +20,15 @@ const appRouter = createBrowserRouter([
       </ProtectedRoute>
     ),
   },
+  {
+    path: "*",
+    element: (
+      <div className="flex items-center justify-between">
+        <h1>404</h1>
+        <p>Page not found</p>
+      </div>
+    ),
+  },
 ]);
 function App() {
   return <RouterProvider router={appRouter} />;

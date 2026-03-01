@@ -23,7 +23,7 @@ import axios from "axios";
 import { PacmanLoader } from "react-spinners";
 
 function Form({ type, open, onClose, onCapsuleAdded }) {
-  const API_URL = "http://localhost:8000/api/v1";
+  const API_URL = `${import.meta.env.VITE_API_URL}`;
   const [date, setDate] = useState(undefined);
   const [calendarOpen, setCalendarOpen] = useState(false);
   const [time, setTime] = useState("00:00:00");

@@ -1,10 +1,10 @@
 import cron from "node-cron";
 import Capsule from "../models/capsule.model.js";
+import mongoose from "mongoose";
 
 const cronJob = cron.schedule(
   "* * * * * *",
   async () => {
-    // every minute
     try {
       const now = new Date();
       const capsulesToUpdate = await Capsule.find({
@@ -25,14 +25,14 @@ const cronJob = cron.schedule(
       if (capsulesToUpdate.length > 0) {
         await Capsule.updateMany(
           { _id: { $in: capsulesToUpdate.map((c) => c._id) } },
-          { isSealed: false }
+          { isSealed: false },
         );
       }
     } catch (err) {
       console.error("Cron job error:", err);
     }
   },
-  { scheduled: false }
+  { scheduled: false },
 ); // export without starting
 
 export default cronJob;

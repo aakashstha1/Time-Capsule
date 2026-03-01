@@ -3,7 +3,7 @@ import { createContext, useContext, useState } from "react";
 import axios from "axios";
 import { toast } from "sonner";
 
-const API_URL = "http://localhost:8000/api/v1/auth";
+const API_URL = `${import.meta.env.VITE_API_URL}/auth`;
 
 const AuthContext = createContext();
 

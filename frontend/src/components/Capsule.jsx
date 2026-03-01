@@ -31,7 +31,7 @@ function Capsule({
   created_At,
   onDelete,
 }) {
-  const API_URL = "http://localhost:8000/api/v1";
+  const API_URL = `${import.meta.env.VITE_API_URL}`;
 
   const [timeLeft, setTimeLeft] = useState(null);
   const [isOpen, setIsOpen] = useState(false);
