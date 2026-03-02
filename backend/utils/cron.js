@@ -1,6 +1,5 @@
 import cron from "node-cron";
 import Capsule from "../models/capsule.model.js";
-import mongoose from "mongoose";
 
 const cronJob = cron.schedule(
   "* * * * * *",

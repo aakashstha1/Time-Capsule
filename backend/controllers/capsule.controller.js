@@ -1,6 +1,6 @@
 import { DateTimeValidator } from "../utils/DateTimeValidator.js";
 import Capsule from "../models/capsule.model.js";
-import { validateBodyByType } from "../utils/ValidateBodyByType.js";
+import { validateBodyByType } from "../utils/validateBodyByType.js";
 import { v2 as cloudinary } from "cloudinary";
 
 // ----------------------------------------------------- Get loggedin User capsules ---------------------------------------
