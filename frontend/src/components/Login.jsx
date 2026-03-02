@@ -84,7 +84,7 @@ function Login() {
       {/* Login/Signup Button */}
       <Button
         variant="outline"
-        className="text-xl font-semibold px-10 py-4 hover:bg-purple-600 hover:text-white transition-all duration-300"
+        className="text-xl font-semibold px-10 py-6 hover:bg-purple-600 hover:text-white transition-all duration-300"
         onClick={handleLoginOpen}
       >
         Login / Signup

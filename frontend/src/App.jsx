@@ -1,8 +1,8 @@
 import React from "react";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import LandingPage from "./pages/LandingPage";
-import HomePage from "./pages/homePage";
 import { GuestRoute, ProtectedRoute } from "./components/ProtectedRoutes";
+import HomePage from "./pages/HomePage";
 const appRouter = createBrowserRouter([
   {
     path: "/",
