@@ -14,7 +14,7 @@ export const getCapsules = async (req, res) => {
     const capsules = await Capsule.find({ user: userId }).sort({
       createdAt: -1,
     });
-    res.status(200).json(capsules);
+    res.status(200).json({ success: true, capsules });
   } catch (error) {
     console.log("Capsule Fetch error", error);
     res.status(500).json({ message: "Failed to fetch capsules" });

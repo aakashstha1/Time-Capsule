@@ -23,21 +23,22 @@ function Capsules({ capsules = [], loading, setCapsules }) {
 
   return (
     <div className="grid grid-cols-3 mt-10 gap-y-6">
-      {capsules.map((item) => (
-        <Capsule
-          key={item._id}
-          id={item._id}
-          type={item.type}
-          body={item.body}
-          file={item.file}
-          openDate={item.openDate}
-          openTime={item.openTime}
-          created_At={item.createdAt}
-          onDelete={(id) =>
-            setCapsules((prev) => prev.filter((c) => c._id !== id))
-          }
-        />
-      ))}
+      {Array.isArray(capsules) &&
+        capsules.map((item) => (
+          <Capsule
+            key={item._id}
+            id={item._id}
+            type={item.type}
+            body={item.body}
+            file={item.file}
+            openDate={item.openDate}
+            openTime={item.openTime}
+            created_At={item.createdAt}
+            onDelete={(id) =>
+              setCapsules((prev) => prev.filter((c) => c._id !== id))
+            }
+          />
+        ))}
     </div>
   );
 }

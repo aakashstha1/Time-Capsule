@@ -4,7 +4,8 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 
 function HomePage() {
-  const API_URL = `${import.meta.env.VITE_API_URL}`;
+  // const API_URL = `${import.meta.env.VITE_API_URL}`;
+  const API_URL = "/api/v1";
 
   const [capsules, setCapsules] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -19,7 +20,7 @@ function HomePage() {
       const res = await axios.get(`${API_URL}/capsule`, {
         withCredentials: true,
       });
-      setCapsules(res.data);
+      setCapsules(res.data.capsules);
     } catch (err) {
       console.error(err);
     } finally {
