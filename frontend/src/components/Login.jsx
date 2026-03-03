@@ -20,7 +20,8 @@ function Login() {
   const navigate = useNavigate();
   const [dialogType, setDialogType] = useState(null); // "login" | "signup"
   const { login, loading } = useAuth();
-  const API_URL = `${import.meta.env.VITE_API_URL}`;
+  // const API_URL = `${import.meta.env.VITE_API_URL}`;
+  const API_URL = "/api/v1";
 
   const initialForm = {
     username: "",
