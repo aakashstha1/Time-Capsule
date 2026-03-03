@@ -12,7 +12,7 @@ app.use(
   cors({
     origin: [
       "http://localhost:5173",
-      " https://time-capsule-4fhl.onrender.com",
+      "https://time-capsule-4fhl.onrender.com",
     ],
     credentials: true,
   }),
