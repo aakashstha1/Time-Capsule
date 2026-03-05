@@ -1,0 +1,3 @@
+- Use device time for countdown
+- Not reponsive
+- Bug in toggle isSealed in audio
