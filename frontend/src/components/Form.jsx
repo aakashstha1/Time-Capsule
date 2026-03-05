@@ -33,12 +33,6 @@ function Form({ type, open, onClose, onCapsuleAdded }) {
   const [loading, setLoading] = useState(false);
 
   const today = new Date();
-  // Allow selecting dates up to 50 years in the future
-  const maxDate = new Date(
-    today.getFullYear() + 50,
-    today.getMonth(),
-    today.getDate(),
-  );
 
   const handleSubmit = async () => {
     if (!date || !time) {
@@ -113,8 +107,9 @@ function Form({ type, open, onClose, onCapsuleAdded }) {
                     mode="single"
                     selected={date}
                     captionLayout="dropdown"
-                    fromDate={today}
-                    toDate={maxDate}
+                    fromYear={today.getFullYear()}
+                    toYear={today.getFullYear() + 50}
+                    disabled={{ before: today }}
                     onSelect={(d) => {
                       setDate(d);
                       setCalendarOpen(false);

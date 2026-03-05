@@ -279,7 +279,7 @@
 // }
 
 import { CalendarClock, LockKeyhole, MoreHorizontal } from "lucide-react";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { Button } from "./ui/button";
 import {
   DropdownMenu,
@@ -301,6 +301,23 @@ import { File, Image, Music, Type, Video } from "lucide-react";
 import axios from "axios";
 import { toast } from "sonner";
 
+// Fetches real UTC time from worldtimeapi.org and returns the difference
+// between server time and device time in milliseconds.
+// Falls back to 0 (device time) if the request fails.
+async function fetchServerTimeOffset() {
+  try {
+    const before = Date.now();
+    const res = await fetch("https://worldtimeapi.org/api/timezone/UTC");
+    const after = Date.now();
+    const data = await res.json();
+    const serverTime = new Date(data.utc_datetime).getTime();
+    const deviceTime = Math.round((before + after) / 2); // midpoint to reduce latency error
+    return serverTime - deviceTime;
+  } catch {
+    return 0;
+  }
+}
+
 function Capsule({
   id,
   type,
@@ -311,15 +328,15 @@ function Capsule({
   created_At,
   onDelete,
 }) {
-  // const API_URL = "/api/v1";
-  const API_URL = `${import.meta.env.VITE_API_URL}`;
-
+  // const API_URL = `${import.meta.env.VITE_API_URL}`;
+  const API_URL = "/api/v1";
 
   const [timeLeft, setTimeLeft] = useState(null);
   const [isOpen, setIsOpen] = useState(false);
   const [openCapsule, setOpenCapsule] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const offsetRef = useRef(0);
 
   const typeIcons = {
     file: <File size={18} color="orange" />,
@@ -330,27 +347,36 @@ function Capsule({
   };
 
   useEffect(() => {
-    const targetDateTime = new Date(`${openDate} ${openTime}`).getTime();
+    let interval;
 
-    const interval = setInterval(() => {
-      const now = Date.now();
-      const diff = targetDateTime - now;
+    const init = async () => {
+      // Fetch server time offset once on mount
+      offsetRef.current = await fetchServerTimeOffset();
 
-      if (diff <= 0) {
-        clearInterval(interval);
-        setIsOpen(true);
-        setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 });
-        return;
-      }
+      const targetDateTime = new Date(`${openDate} ${openTime}`).getTime();
 
-      setTimeLeft({
-        days: Math.floor(diff / (1000 * 60 * 60 * 24)),
-        hours: Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
-        minutes: Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60)),
-        seconds: Math.floor((diff % (1000 * 60)) / 1000),
-      });
-    }, 1000);
+      interval = setInterval(() => {
+        // Corrected now = device clock + offset to align with real world time
+        const now = Date.now() + offsetRef.current;
+        const diff = targetDateTime - now;
 
+        if (diff <= 0) {
+          clearInterval(interval);
+          setIsOpen(true);
+          setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+          return;
+        }
+
+        setTimeLeft({
+          days: Math.floor(diff / (1000 * 60 * 60 * 24)),
+          hours: Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
+          minutes: Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60)),
+          seconds: Math.floor((diff % (1000 * 60)) / 1000),
+        });
+      }, 1000);
+    };
+
+    init();
     return () => clearInterval(interval);
   }, [openDate, openTime]);
 

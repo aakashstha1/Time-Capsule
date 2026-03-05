@@ -3,7 +3,7 @@ import React from "react";
 function Footer() {
   return (
     <footer className="w-full border-t border-gray-200 bg-white/80 backdrop-blur-sm py-4 mt-auto">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-2">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col items-center justify-between gap-2">
         {/* Branding */}
         <div className="flex items-center gap-2">
           <span className="text-lg font-extrabold tracking-tight text-purple-600">
