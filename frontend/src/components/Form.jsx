@@ -23,7 +23,6 @@ import axios from "axios";
 import { PacmanLoader } from "react-spinners";
 
 function Form({ type, open, onClose, onCapsuleAdded }) {
-  // const API_URL = `${import.meta.env.VITE_API_URL}`;
   const API_URL = "/api/v1";
 
   const [date, setDate] = useState(undefined);
@@ -32,7 +31,14 @@ function Form({ type, open, onClose, onCapsuleAdded }) {
   const [text, setText] = useState("");
   const [file, setFile] = useState(null);
   const [loading, setLoading] = useState(false);
-  // console.log(date, time);
+
+  const today = new Date();
+  // Allow selecting dates up to 50 years in the future
+  const maxDate = new Date(
+    today.getFullYear() + 50,
+    today.getMonth(),
+    today.getDate(),
+  );
 
   const handleSubmit = async () => {
     if (!date || !time) {
@@ -44,24 +50,24 @@ function Form({ type, open, onClose, onCapsuleAdded }) {
     formData.append("type", type.toLowerCase());
 
     const yyyy = date.getFullYear();
-    const mm = (date.getMonth() + 1).toString().padStart(2, "0"); // month is 0-indexed
+    const mm = (date.getMonth() + 1).toString().padStart(2, "0");
     const dd = date.getDate().toString().padStart(2, "0");
 
-    formData.append("openDate", `${yyyy}-${mm}-${dd}`); // local date
-    formData.append("openTime", time); // keep time string
+    formData.append("openDate", `${yyyy}-${mm}-${dd}`);
+    formData.append("openTime", time);
+
     if (type.toLowerCase() === "text") {
       formData.append("body", text);
     } else {
       formData.append("file", file);
     }
-    // Then send via axios
+
     try {
       setLoading(true);
       const res = await axios.post(`${API_URL}/capsule/add`, formData, {
         withCredentials: true,
       });
       toast.success(res?.data?.message || "Capsule added successfully");
-      // console.log(res?.data);
       onCapsuleAdded(res?.data?.capsule);
     } catch (err) {
       toast.error(err.response?.data?.message || "Capsule addition failed");
@@ -73,7 +79,7 @@ function Form({ type, open, onClose, onCapsuleAdded }) {
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-lg">
+      <DialogContent className="w-[92vw] sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>
             {type?.charAt(0).toUpperCase() + type?.slice(1)}
@@ -107,6 +113,8 @@ function Form({ type, open, onClose, onCapsuleAdded }) {
                     mode="single"
                     selected={date}
                     captionLayout="dropdown"
+                    fromDate={today}
+                    toDate={maxDate}
                     onSelect={(d) => {
                       setDate(d);
                       setCalendarOpen(false);
@@ -156,16 +164,17 @@ function Form({ type, open, onClose, onCapsuleAdded }) {
                   type === "audio"
                     ? "audio/*"
                     : type === "video"
-                    ? "video/*"
-                    : type === "image"
-                    ? "image/*"
-                    : "*"
+                      ? "video/*"
+                      : type === "image"
+                        ? "image/*"
+                        : "*"
                 }
                 onChange={(e) => setFile(e.target.files[0])}
               />
             </div>
           )}
         </div>
+
         <DialogFooter>
           <DialogClose asChild>
             <Button variant="outline">Cancel</Button>
