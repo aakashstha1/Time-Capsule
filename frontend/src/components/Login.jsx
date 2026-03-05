@@ -280,6 +280,18 @@ function Login() {
         <DialogContent className="w-[92vw] sm:max-w-md rounded-xl bg-white p-5 sm:p-6 shadow-xl">
           <DialogHeader>
             <DialogTitle className="text-2xl font-bold">
+              {/* Switch Link */}
+              <p className="text-sm text-center my-4 text-gray-600">
+                {isLogin
+                  ? "Don't have an account?"
+                  : "Already have an account?"}{" "}
+                <span
+                  className="cursor-pointer text-purple-600 hover:underline"
+                  onClick={() => switchDialog(isLogin ? "signup" : "login")}
+                >
+                  {isLogin ? "Signup" : "Login"} here
+                </span>
+              </p>
               {isLogin ? "Login" : "Signup"}
             </DialogTitle>
             <DialogDescription className="text-gray-600 mt-1">
@@ -348,17 +360,6 @@ function Login() {
               </DialogClose>
             </div>
           </form>
-
-          {/* Switch Link */}
-          <p className="text-sm text-center mt-4 text-gray-600">
-            {isLogin ? "Don't have an account?" : "Already have an account?"}{" "}
-            <span
-              className="cursor-pointer text-purple-600 hover:underline"
-              onClick={() => switchDialog(isLogin ? "signup" : "login")}
-            >
-              {isLogin ? "Signup" : "Login"} here
-            </span>
-          </p>
         </DialogContent>
       </Dialog>
     </div>
